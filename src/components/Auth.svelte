@@ -1,10 +1,14 @@
 <script lang="ts">
     import Error from "./ErrorAlert.svelte";
     import { fade } from "svelte/transition";
+    import { getContext } from "svelte";
+    import axios from "axios";
 
     type AuthMode = "login" | "register";
 
     export let authMode: AuthMode = "register";
+    export let next: string = "/posts";
+    const apiUrl: string = getContext("apiUrl");
 
     let loginError: string | null = null;
     let registerError: string | null = null;
@@ -23,6 +27,27 @@
             return;
         }
         loginError = null;
+
+        axios
+            .post(apiUrl + "/auth/local", {
+                identifier: email,
+                password,
+            })
+            .then(({ data }) => {
+                localStorage.setItem("JWT", data.jwt);
+                localStorage.setItem("user", JSON.stringify(data.user));
+                // Using window.location.href instead of router.redirect to refresh the page
+                // so that components like Navbar update too
+                window.location.href = next;
+            })
+            .catch((err) => {
+                if (err.response) {
+                    loginError = "";
+                    for (let message of err.response.data.message[0].messages) {
+                        loginError += `${message.message}\n`;
+                    }
+                } else loginError = err;
+            });
     }
 
     function register() {
@@ -35,7 +60,34 @@
             registerError = "Fill out all fields!";
             return;
         }
+
+        if (password !== cpassword) {
+            registerError = "Passwords don't match";
+            return;
+        }
         registerError = null;
+
+        axios
+            .post(apiUrl + "/auth/local/register", {
+                email,
+                username,
+                password,
+            })
+            .then(({ data }) => {
+                localStorage.setItem("JWT", data.jwt);
+                localStorage.setItem("user", JSON.stringify(data.user));
+                // Using window.location.href instead of router.redirect to refresh the page
+                // so that components like Navbar update too
+                window.location.href = next;
+            })
+            .catch((err) => {
+                if (err.response) {
+                    registerError = "";
+                    for (let message of err.response.data.message[0].messages) {
+                        registerError += `${message.message}\n`;
+                    }
+                } else registerError = err;
+            });
     }
 </script>
 

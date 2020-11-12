@@ -1,5 +1,5 @@
 export interface User {
-    id: string;
+    id: number;
     username: string;
     email: string;
     provider: string;
@@ -31,7 +31,7 @@ export interface Comment {
     updated_at: string;
 }
 
-interface Image {
+export interface Image {
     id: number;
     name: string;
     alternativeText: string;

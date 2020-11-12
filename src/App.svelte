@@ -10,6 +10,8 @@
     import OnePost from "./routes/onePost.svelte";
     import NotFound from "./routes/NotFound.svelte";
     import UserProfile from "./routes/userProfile.svelte";
+    import Logout from "./routes/logout.svelte";
+    import NewPost from "./routes/newPost.svelte";
 
     export let strapiApiUrl: string;
 
@@ -28,6 +30,8 @@
     router("/posts", setupRouteParams, () => (page = Posts));
     router("/@:username/:postId", setupRouteParams, () => (page = OnePost));
     router("/@:username", setupRouteParams, () => (page = UserProfile));
+    router("/logout", setupRouteParams, () => (page = Logout));
+    router("/new", setupRouteParams, () => (page = NewPost));
     router("/*", () => (page = NotFound));
 
     router.start();

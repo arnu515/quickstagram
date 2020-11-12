@@ -1,8 +1,16 @@
 <script lang="ts">
+    import { onMount } from "svelte";
+    import { getToken } from "../auth";
+    import router from "page";
+
     import Auth from "../components/Auth.svelte";
 
     export const queryString = {};
     export const params = {};
+
+    onMount(() => {
+        if (getToken()) router.redirect("/posts");
+    });
 </script>
 
 <div class="w3-container">
@@ -19,4 +27,11 @@
     </div>
 
     <Auth />
+
+    <div class="w3-center">
+        <a
+            href="/posts"
+            class="w3-button w3-blue w3-border w3-border-blue w3-hover-blue">View
+            posts</a>
+    </div>
 </div>

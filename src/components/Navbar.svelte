@@ -1,5 +1,8 @@
 <script lang="ts">
     import { slide } from "svelte/transition";
+    import { getToken } from "../auth";
+
+    const auth = !!getToken();
     let active = false;
 </script>
 
@@ -40,25 +43,36 @@
             <i class="fas fa-{active ? 'times' : 'bars'}" /></button>
     </div>
     <div class="w3-right w3-hide-small">
-        <a href="/upload" class="w3-bar-item w3-button w3-hover-blue">Upload</a>
-        <a
-            href="/auth?action=login"
-            class="w3-bar-item w3-button w3-hover-blue">Login</a>
-        <a
-            href="/auth?action=register"
-            class="w3-bar-item w3-button w3-purple w3-hover-purple">Register</a>
-    </div>
-    {#if active}
-        <div class="w3-right nav w3-hide-large w3-hide-medium" transition:slide>
+        {#if auth}
+            <a href="/new" class="w3-bar-item w3-button w3-hover-blue">New post</a>
             <a
-                href="/upload"
-                class="w3-bar-item w3-button w3-hover-blue">Upload</a>
+                href="/logout"
+                class="w3-bar-item w3-button w3-hover-blue">Logout</a>
+        {:else}
             <a
                 href="/auth?action=login"
                 class="w3-bar-item w3-button w3-hover-blue">Login</a>
             <a
                 href="/auth?action=register"
                 class="w3-bar-item w3-button w3-purple w3-hover-purple">Register</a>
+        {/if}
+    </div>
+    {#if active}
+        <div class="w3-right nav w3-hide-large w3-hide-medium" transition:slide>
+            {#if auth}
+                <a href="/new" class="w3-bar-item w3-button w3-hover-blue">New
+                    post</a>
+                <a
+                    href="/logout"
+                    class="w3-bar-item w3-button w3-hover-blue">Logout</a>
+            {:else}
+                <a
+                    href="/auth?action=login"
+                    class="w3-bar-item w3-button w3-hover-blue">Login</a>
+                <a
+                    href="/auth?action=register"
+                    class="w3-bar-item w3-button w3-purple w3-hover-purple">Register</a>
+            {/if}
         </div>
     {/if}
 </div>

@@ -2,12 +2,17 @@
     import axios from "axios";
     import { getContext } from "svelte";
     import router from "page";
+    import { getToken, getUserId } from "../auth";
 
     import type { Post, Comment as CommentType } from "../types";
     import Comment from "../components/Comment.svelte";
+    import ErrorAlert from "../components/ErrorAlert.svelte";
 
     export let params: { username: string; postId: string };
     const apiUrl = getContext("apiUrl");
+    const auth = !!getToken();
+
+    let commentError: string | null = null;
 
     async function getPost(): Promise<Post> {
         try {
@@ -57,9 +62,65 @@
             } else throw new Error(err);
         }
     }
+
+    function newComment(postId: number) {
+        // "as HTMLInputElement" is supported in TypeScript only.
+        const userId: number | null = getUserId();
+        if (!userId) {
+            window.location.href =
+                "/auth?action=login&next=" + window.location.pathname;
+            return;
+        }
+
+        const content = (
+            (document.getElementById("comment") as HTMLInputElement).value || ""
+        ).trim();
+        if (!content) return;
+
+        axios
+            .post<Comment>(
+                apiUrl + "/comments",
+                {
+                    content,
+                    post: postId,
+                    user: userId,
+                },
+                {
+                    headers: {
+                        Authorization: "Bearer " + getToken(),
+                    },
+                }
+            )
+            .then(() => window.location.reload())
+            .catch((error) => {
+                if (error.response) {
+                    if (
+                        error.response.status === 401 ||
+                        error.response.status === 403
+                    )
+                        window.location.href =
+                            "/auth?action=login&next=" +
+                            window.location.pathname;
+                    else {
+                        commentError = "";
+                        for (let message of error.response.data.message[0]
+                            .messages) {
+                            commentError += `${message.message}\n`;
+                        }
+                    }
+                } else commentError = error;
+            });
+    }
 </script>
 
 <style>
+    #comment-form {
+        display: grid;
+        grid-template-rows: auto;
+        grid-template-columns: 80% 20%;
+        margin: 1rem 0;
+    }
+
     .post {
         width: 50%;
         margin: 0 auto;
@@ -104,6 +165,23 @@
             <h3>Comments</h3>
         </header>
         <div class="w3-container">
+            {#if auth}
+                {#if commentError}
+                    <ErrorAlert message={commentError} />
+                {/if}
+                <form
+                    on:submit|preventDefault={() => newComment(post.id)}
+                    id="comment-form">
+                    <input
+                        type="text"
+                        class="w3-input w3-border"
+                        placeholder="Type your comment here"
+                        id="comment" />
+                    <button
+                        class="w3-button w3-blue w3-hover-blue w3-border w3-border-blue"
+                        type="submit">Add</button>
+                </form>
+            {/if}
             {#await getComments(post)}
                 <div class="w3-center w3-section w3-xxlarge w3-spin">
                     <i class="fas fa-spinner" />
