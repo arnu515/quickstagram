@@ -27,7 +27,7 @@
 
 <div class="w3-card post w3-section">
     <a href="/@{post.user.username}/{post.id}"><img
-            src={post.image[0].provider === 'local' && getContext('apiUrl') + post.image[0].url}
+            src={post.image.provider === 'local' ? getContext('apiUrl') + post.image.url : post.image.url}
             alt={post.image.alternativeText || 'Post image'}
             style="width: 100%" /></a>
     <div class="w3-container">

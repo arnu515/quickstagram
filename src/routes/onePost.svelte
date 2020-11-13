@@ -146,8 +146,8 @@
 {:then post}
     <div class="w3-card post">
         <a
-            href={post.image[0].provider === 'local' && getContext('apiUrl') + post.image[0].url}><img
-                src={post.image[0].provider === 'local' && getContext('apiUrl') + post.image[0].url}
+            href={post.image.provider === 'local' && getContext('apiUrl') + post.image.url}><img
+                src={post.image.provider === 'local' && getContext('apiUrl') + post.image.url}
                 alt={post.image.alternativeText || 'Post image'}
                 style="width: 100%" /></a>
         <div class="w3-container">
