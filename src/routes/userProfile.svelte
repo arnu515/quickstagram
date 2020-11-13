@@ -12,7 +12,7 @@
             const { data } = await axios.get<Post[]>(
                 getContext("apiUrl") + "/posts"
             );
-            return data.map((post) => {
+            return data.filter((post) => {
                 if (post.user.username === params.username) return post;
             });
         } catch (err) {
